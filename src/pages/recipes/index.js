@@ -1,15 +1,18 @@
 import { CardMedia, Container, Grid, TextField, Card, CardContent, Typography, CardActionArea } from "@mui/material";
 import { useEffect } from "react";
 import { useState } from "react";
+import emptyIcon from "../../assets/images/undraw_empty_re_opql.svg";
 
 export default function Recipes() {
     const [recipes, setRecipes] = useState([]);
+    const [keyword, setKeyword] = useState ("");
 
 
     const getRecipes = () => {
         // prepare URL
         const url = new URL("https://api.spoonacular.com/recipes/complexSearch");
-        url.searchParams.append("apiKey", '9a1ff3f86bc943b59a4a406c55c3dbde')
+        url.searchParams.append("apiKey", process.env.REACT_APP_SPOONACULAR_API_KEY);
+        url.searchParams.append('query', keyword);
 
         // fetch recipes from API
         fetch(url)
@@ -27,7 +30,7 @@ export default function Recipes() {
 
     }
 
-    useEffect(getRecipes, []);
+    useEffect(getRecipes, [keyword]);
     return (
 
         <Container sx={{ my: '2rem' }}>
@@ -35,10 +38,12 @@ export default function Recipes() {
                 fullWidth
                 id="outlined-basic"
                 label="Enter a keyword to search recipes and hit Enter"
-                variant="outlined" />
+                variant="outlined" 
+                onKeyDown={event => event.key=== "Enter" && 
+                 setKeyword (event.target.value)}/>
 
             <Grid sx={{ mt: '1rem' }} container spacing={3}>
-                {recipes.map(recipe=>(<Grid key={recipe.id} item xs={4}>
+                {recipes.length > 0 ? recipes.map(recipe=>(<Grid key={recipe.id} item xs={4}>
                     <Card sx={{ maxWidth: 345, height:'100%' }}>
                         <CardActionArea sx={{height: "100"}}>
                             <CardMedia
@@ -55,7 +60,7 @@ export default function Recipes() {
                             </CardContent>
                         </CardActionArea>
                     </Card>
-                </Grid>))}
+                </Grid>)) :<img src={emptyIcon} width={"50%"}/>}
 
             </Grid>
         </Container>
